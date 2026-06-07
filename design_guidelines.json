@@ -1,0 +1,160 @@
+{
+  "app_name": "Habit Cross Daily Streaker",
+  "theme_and_archetype": {
+    "archetype": "6 (Vibrant Play)",
+    "theme": "Light",
+    "description": "Bright cartoon flat art in the palette of Chicken Road / Crossy Road. Voxel-like, blocky UI elements, high contrast, playful."
+  },
+  "typography": {
+    "font_family_heading": "Fredoka One, Nunito-Black, or system default bold rounded",
+    "font_family_body": "Nunito, system default rounded",
+    "sizes": {
+      "h1": 32,
+      "h2": 24,
+      "h3": 20,
+      "body": 16,
+      "small": 12
+    },
+    "guidelines": "Use heavy weights for headings. Use tracking-tight for large text. Ensure high contrast against backgrounds."
+  },
+  "color_palette": {
+    "primary_background": "#80D8FF",
+    "surface_card": "#FFFFFF",
+    "road_base": "#B0BEC5",
+    "road_lane_divider": "#CFD8DC",
+    "success_tile": "#64DD17",
+    "missed_fire_tile": "#FF3D00",
+    "milestone_gold": "#FFD600",
+    "text_primary": "#263238",
+    "text_secondary": "#546E7A",
+    "habit_colors": [
+      "#FF4081",
+      "#E040FB",
+      "#536DFE",
+      "#18FFFF",
+      "#FFAB40",
+      "#FF5252"
+    ],
+    "action_button": "#2962FF"
+  },
+  "spacing_and_layout": {
+    "container_padding": 16,
+    "card_padding": 16,
+    "gap_small": 8,
+    "gap_medium": 16,
+    "gap_large": 24,
+    "border_radius": {
+      "small": 8,
+      "medium": 12,
+      "large": 24
+    }
+  },
+  "ui_components": {
+    "buttons": {
+      "style": "Chunky, blocky feel. borderBottomWidth: 4, borderRadius: 16. Colors should pop.",
+      "active_state": "Translate Y by 2px and reduce borderBottomWidth to 2px to simulate pressing down."
+    },
+    "cards": {
+      "style": "Flat white backgrounds with subtle 4px bottom border in light gray to look like physical blocks on the background."
+    },
+    "habit_lane": {
+      "description": "A horizontal scrolling area. Each day is a square block (tile). Left side is past, right side is future.",
+      "tile_size": 40,
+      "character_marker": "A neutral runner icon floating above the current day's tile."
+    }
+  },
+  "screens": [
+    {
+      "name": "Welcome/Tutorial",
+      "description": "3 swipeable slides explaining: 1) Add habits 2) Complete days to build green road 3) Missed days create fire blocks. Big bold illustrations.",
+      "key_elements": [
+        "Horizontal ScrollView with paging",
+        "Pagination dots",
+        "Start button"
+      ]
+    },
+    {
+      "name": "Main Screen",
+      "description": "Vertical list of habits. Each habit shows its name and a horizontal road (lane). The road shows the last 7 days. A 'Done Today' button at the right end of the lane.",
+      "key_elements": [
+        "Header with overall stats/date",
+        "Habit Lane Cards",
+        "Done Today CTA per habit",
+        "Floating Add Habit button (FAB)"
+      ]
+    },
+    {
+      "name": "Habit Detail",
+      "description": "Deep dive into a single habit. Shows the full road history, calendar heatmap, and edit options.",
+      "key_elements": [
+        "Full History Road",
+        "Calendar Grid Heatmap",
+        "Streak Counters (Current, Best)",
+        "Delete/Edit buttons"
+      ]
+    },
+    {
+      "name": "Add Habit",
+      "description": "Form to create a new habit. Requires name, category color, and icon.",
+      "key_elements": [
+        "Name Input",
+        "Color Picker (horizontal list of circles)",
+        "Icon Picker",
+        "Save Button"
+      ]
+    },
+    {
+      "name": "Stats",
+      "description": "Gamification center. Shows badges and overall consistency.",
+      "key_elements": [
+        "30-Day Month Master Badge display",
+        "Global Heatmap",
+        "Total days crossed"
+      ]
+    },
+    {
+      "name": "Settings",
+      "description": "Basic app settings.",
+      "key_elements": [
+        "Notification toggles",
+        "Theme toggle",
+        "About app"
+      ]
+    }
+  ],
+  "game_mechanics": {
+    "daily_completion": "Changes the current day tile to 'success_tile' (green). Character moves one step forward (right).",
+    "missed_day": "Changes the tile to 'missed_fire_tile' (orange/fire). Breaks the streak.",
+    "milestones": "Every 7th consecutive day completed becomes a 'milestone_gold' tile.",
+    "badges": "Completing 30 days in a row unlocks the 'Month Master' badge."
+  },
+  "images_and_assets": {
+    "image_urls": [
+      {
+        "url": "https://images.unsplash.com/photo-1651557452559-04db8ace569d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTN8MHwxfHNlYXJjaHwxfHxjYXJ0b29uJTIwcm9hZCUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzgwODMzNzQzfDA&ixlib=rb-4.1.0&q=85",
+        "category": "background_inspiration",
+        "description": "Cartoon road style reference for welcome screen"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1613826488066-5a115a53a1fc?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjV8MHwxfHNlYXJjaHwyfHxnb2xkJTIwbWVkYWwlMjBhY2hpZXZlbWVudHxlbnwwfHx8fDE3ODA4MzM3NDR8MA&ixlib=rb-4.1.0&q=85",
+        "category": "badge_icon",
+        "description": "Gold round coin representing Month Master badge"
+      }
+    ],
+    "icons_strategy": "Use @expo/vector-icons (MaterialCommunityIcons or FontAwesome5). Stick to solid, rounded icons to match the flat art style."
+  },
+  "testing": {
+    "test_id_rule": "All interactive and key informational elements MUST include a data-testid attribute to facilitate robust automated testing. For React Native, apply both testID='id' and data-testid='id' as properties on the component."
+  },
+  "instructions_to_main_agent": [
+    "This is an Expo React Native app. Do not use HTML/Tailwind classes.",
+    "Write all components in .js files, NOT .tsx files.",
+    "Use StyleSheet for styling. Emulate Tailwind's generous spacing philosophy (e.g., use padding: 16 instead of 4).",
+    "For the 'Crossy Road' flat art blocky style, emulate 3D using backgroundColor with borderBottomWidth: 4 and borderRightWidth: 2 with a darker shade (or rgba(0,0,0,0.1)) on Views and Buttons.",
+    "Implement the 'Habit Lane' as a horizontal FlatList or ScrollView.",
+    "Tiles should be perfectly square Views.",
+    "Make sure forms disable the Save button until required fields are filled.",
+    "For typography, if custom fonts aren't easily configured, use fontWeight: '900' for headings to simulate thick cartoon fonts.",
+    "Assign a data-testid and testID to all TouchableOpacity, TextInput, and important Text components (e.g., data-testid='habit-item-card')."
+  ]
+}
