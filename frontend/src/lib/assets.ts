@@ -1,7 +1,9 @@
-import { storage } from "@/src/utils/storage";
+// Asset loader: tries to fetch the AI-generated asset pack from backend
+// (which caches it in MongoDB). The pack is kept in memory only — caching
+// 6 MB worth of base64 PNGs in AsyncStorage hits the platform quota on web
+// and risks the 6 MB default on Android. Backend round-trip is fast.
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
-const CACHE_KEY = "assets.pack.v1";
 
 export type AssetKey =
   | "runner_running"
@@ -28,7 +30,9 @@ const ALL_KEYS: AssetKey[] = [
 
 export function isPackComplete(pack: AssetPack | null | undefined): boolean {
   if (!pack) return false;
-  return ALL_KEYS.every((k) => typeof pack[k] === "string" && pack[k]!.length > 100);
+  return ALL_KEYS.every(
+    (k) => typeof pack[k] === "string" && pack[k]!.length > 100,
+  );
 }
 
 export function dataUri(b64: string | undefined): string | null {
@@ -36,21 +40,6 @@ export function dataUri(b64: string | undefined): string | null {
   return `data:image/png;base64,${b64}`;
 }
 
-async function loadCached(): Promise<AssetPack | null> {
-  const raw = await storage.getItem<string>(CACHE_KEY, "");
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as AssetPack;
-  } catch {
-    return null;
-  }
-}
-
-async function saveCached(pack: AssetPack): Promise<void> {
-  await storage.setItem(CACHE_KEY, JSON.stringify(pack));
-}
-
-// Returns the most recent server-side pack (if any), or null.
 async function fetchServerPack(): Promise<AssetPack | null> {
   if (!BACKEND_URL) return null;
   try {
@@ -81,33 +70,16 @@ async function triggerGenerate(): Promise<AssetPack | null> {
   }
 }
 
-// Public: tries local cache -> server cache -> generation.
-// `onProgress` is called with a status string for UX.
 export async function ensureAssets(
   onProgress?: (s: string) => void,
 ): Promise<AssetPack | null> {
-  const cached = await loadCached();
-  if (isPackComplete(cached)) return cached;
-
-  onProgress?.("Fetching artwork…");
+  onProgress?.("Loading artwork…");
   const server = await fetchServerPack();
-  if (isPackComplete(server)) {
-    await saveCached(server!);
-    return server;
-  }
+  if (isPackComplete(server)) return server;
 
   onProgress?.("Generating artwork (one-time, ~30s)…");
   const generated = await triggerGenerate();
-  if (isPackComplete(generated)) {
-    await saveCached(generated!);
-    return generated;
-  }
+  if (isPackComplete(generated)) return generated;
 
-  // Partial pack -> still save what we have.
-  if (generated) await saveCached(generated);
   return generated;
-}
-
-export async function getCachedPack(): Promise<AssetPack | null> {
-  return loadCached();
 }

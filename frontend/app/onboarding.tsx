@@ -94,7 +94,11 @@ export default function Onboarding() {
             >
               <View style={styles.illustrationWrap}>
                 {imgUri ? (
-                  <Image source={{ uri: imgUri }} style={styles.illustration} />
+                  <Image
+                    source={{ uri: imgUri }}
+                    style={styles.illustration}
+                    resizeMode="contain"
+                  />
                 ) : (
                   <MaterialCommunityIcons
                     name={s.fallbackIcon as any}
@@ -169,7 +173,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 6,
     borderBottomColor: "rgba(0,0,0,0.08)",
   },
-  illustration: { width: 180, height: 180, resizeMode: "contain" },
+  illustration: { width: 180, height: 180 },
   title: {
     fontSize: 26,
     fontWeight: "900",

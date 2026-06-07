@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
     borderBottomColor: "#FBC02D",
   },
-  badgeImg: { width: 80, height: 80, resizeMode: "contain" },
+  badgeImg: { width: 80, height: 80 },
   badgeName: {
     fontWeight: "900",
     color: "#263238",

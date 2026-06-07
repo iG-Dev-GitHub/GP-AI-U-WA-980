@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
     borderBottomColor: "#FBC02D",
   },
-  badgeImg: { width: 64, height: 64, resizeMode: "contain" },
+  badgeImg: { width: 64, height: 64 },
   badgeTitle: { fontWeight: "900", fontSize: 16, color: "#7E5A00" },
   badgeSub: { fontSize: 12, color: "#7E5A00", fontWeight: "700" },
   sectionTitle: {

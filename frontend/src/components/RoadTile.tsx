@@ -67,7 +67,7 @@ export default function RoadTile({
       ) : null}
 
       {showCharacter ? (
-        <View pointerEvents="none" style={styles.charWrap}>
+        <View style={styles.charWrap}>
           {charUri ? (
             <Image source={{ uri: charUri }} style={styles.charImg} />
           ) : (
@@ -101,7 +101,6 @@ const styles = StyleSheet.create({
   tileImg: {
     width: TILE_SIZE - 10,
     height: TILE_SIZE - 10,
-    resizeMode: "contain",
   },
   charWrap: {
     position: "absolute",
@@ -111,11 +110,11 @@ const styles = StyleSheet.create({
     height: TILE_SIZE,
     alignItems: "center",
     justifyContent: "flex-end",
+    pointerEvents: "none",
   },
   charImg: {
     width: TILE_SIZE + 4,
     height: TILE_SIZE + 4,
-    resizeMode: "contain",
   },
   todayMark: {
     color: "rgba(255,255,255,0.85)",

@@ -1,0 +1,43 @@
+{
+  "summary": "RETEST after iteration-1 fixes. ALL three reported fixes are confirmed working on the Expo web preview: (1) Tab testIDs tab-road / tab-stats / tab-settings now render as data-testid in the DOM via the custom tabBarButton (Pressable) wrapper — clicking each navigates to home-screen / stats-screen / settings-screen correctly. (2) QuotaExceededError is GONE from console logs — AsyncStorage no longer tries to cache the 6 MB asset pack; assets still load (runner image visible on onboarding slide 1, habit card icons render). (3) shadow* and Image.style.resizeMode deprecation warnings are GONE. One residual deprecation warning remains: 'props.pointerEvents is deprecated. Use style.pointerEvents' (4 occurrences). RoadTile.tsx was correctly fixed, so this warning now originates from React Navigation / Animated.View internals (library-level), not app code — non-blocking. Full happy-path executed end-to-end: onboarding-skip → add-habit-fab → add-habit-name='Read Daily' → add-habit-save → habit card renders → done-today toggles header-stats 0/1 → 1/1 → 0/1 → tab-stats (stats-screen visible) → tab-settings (settings-screen visible) → setting-reset → setting-reset-confirm (data wiped, back to empty 'No road yet'). Backend not retested (was 100% in iteration 1, no backend changes).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Global (RN web) — residual only",
+        "issues": [
+          "'props.pointerEvents is deprecated. Use style.pointerEvents' still appears 4× in console. Source is no longer our code (RoadTile.tsx was fixed) — it originates from React Navigation's internal Animated.View on the tab bar. Non-blocking; can only be fully silenced by upgrading react-navigation."
+        ]
+      }
+    ],
+    "react_native_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_assets_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "OPTIONAL/LOW: Upgrade @react-navigation/bottom-tabs to a version that uses style.pointerEvents internally to silence the last deprecation warning. Not required for functionality.",
+    "OPTIONAL: Long-term, consider persisting AI PNG assets to expo-file-system (~6 MB pack is now only in-memory and re-fetched from backend MongoDB on cold start — acceptable for current online-first warm-up, but offline cold-launch will fall back to MaterialCommunityIcons placeholders)."
+  ],
+  "critical_code_review_comments": [
+    "(tabs)/_layout.tsx — custom Pressable tabBarButton correctly forwards testID to a real DOM node on web. Good fix.",
+    "src/lib/assets.ts — AsyncStorage import removed; pack is fetched fresh from /api/assets and held in memory only. Backend already caches in MongoDB, so cold-start cost is one fetch.",
+    "RoadTile.tsx already uses style.pointerEvents; (tabs)/index.tsx FAB uses boxShadow; onboarding.tsx Image uses prop resizeMode='contain'. All three fixes confirmed in source."
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100% (carried from iteration 1, no changes)",
+    "frontend": "100% — all spec testIDs present, happy-path passes, no QuotaExceededError, no blocking warnings"
+  },
+  "seed_data_creation": "None. Habit 'Read Daily' created and removed via Reset all data within the test.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 2 PASSED. Tab testIDs are now exposed via custom Pressable tabBarButton in (tabs)/_layout.tsx — selector [data-testid='tab-road|tab-stats|tab-settings'] works. AsyncStorage caching of asset pack has been removed (only in-memory + backend MongoDB cache). The residual 'props.pointerEvents' warning is from react-navigation internals (not our code) — safe to ignore. To reset state in tests, run localStorage.clear() then reload — onboarding will reappear.",
+  "rca_of_issue": "All three iteration-1 issues resolved at the correct layers: (a) testID forwarding done by replacing the broken tabBarTestID flow with a controlled Pressable tabBarButton; (b) storage quota eliminated by deleting the AsyncStorage write path entirely and relying on the server-side MongoDB cache; (c) deprecation warnings fixed at each component (FAB→boxShadow, Image→prop resizeMode, RoadTile→style.pointerEvents)."
+}

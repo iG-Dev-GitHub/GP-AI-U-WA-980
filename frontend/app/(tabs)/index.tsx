@@ -233,10 +233,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderBottomWidth: 5,
     borderBottomColor: "#0D47A1",
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 4 },
+    boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
     elevation: 4,
   },
 });
