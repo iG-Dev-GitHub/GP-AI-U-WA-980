@@ -1,16 +1,24 @@
-import { Text, View, StyleSheet, Image } from "react-native";
+import { useEffect } from "react";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { useRouter } from "expo-router";
 
-const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+import { useApp } from "@/src/lib/app-context";
 
 export default function Index() {
-  console.log(EXPO_PUBLIC_BACKEND_URL, "EXPO_PUBLIC_BACKEND_URL");
+  const router = useRouter();
+  const { onboardingDone } = useApp();
+
+  useEffect(() => {
+    if (onboardingDone === null) return;
+    const target = onboardingDone ? "/(tabs)" : "/onboarding";
+    // small defer so the navigator is fully mounted
+    const t = setTimeout(() => router.replace(target as any), 0);
+    return () => clearTimeout(t);
+  }, [onboardingDone, router]);
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={require("../assets/images/app-image.png")}
-        style={styles.image}
-      />
+    <View style={styles.container} testID="boot-screen">
+      <ActivityIndicator color="#2962FF" size="large" />
     </View>
   );
 }
@@ -18,13 +26,8 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0c0c0c",
+    backgroundColor: "#E1F5FE",
     alignItems: "center",
     justifyContent: "center",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "contain",
   },
 });
