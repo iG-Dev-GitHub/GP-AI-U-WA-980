@@ -14,9 +14,13 @@ import os
 import asyncio
 import logging
 import base64
+import io
 import uuid
 from pathlib import Path
 from datetime import datetime, timezone
+
+import numpy as np
+from PIL import Image
 
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 
@@ -42,62 +46,83 @@ logger = logging.getLogger(__name__)
 
 
 # Asset keys + prompts. Style: vibrant Crossy-Road-like flat cartoon, isolated
-# subject on transparent background, sharp clean edges, NO text.
+# subject on a SOLID MAGENTA chroma-key background — we strip it server-side
+# to a true alpha PNG. Gemini does NOT produce real transparency reliably and
+# tends to bake in a checkerboard pattern, so chroma-key is the workaround.
+CHROMA_HEX = "#FF00FF"  # magenta — virtually absent from our subjects
+STYLE = (
+    "flat 2D vector cartoon, vibrant Crossy Road / Chicken Road style, bold "
+    "rounded outline, bright cheerful saturated colors, sticker-like, centered "
+    "subject with small padding around it, no shadows, no ground, no text, no "
+    "letters, no numbers, single clean subject, square composition, solid "
+    f"plain pure magenta {CHROMA_HEX} background filling every pixel that is "
+    "not part of the subject — absolutely no checkerboard pattern, no grid, no "
+    "transparency indicator, no gradient, no texture in the background."
+)
+
 ASSET_PROMPTS = {
     "runner_running": (
-        "A cute neutral cartoon runner character, flat 2D vector style, "
-        "vibrant Crossy Road / Chicken Road art direction, mid-stride running "
-        "pose facing right, big friendly eyes, simple rounded body, bold "
-        "outline, bright cheerful colors, completely isolated on a fully "
-        "transparent background, no shadow, no ground, no text, no UI, "
-        "centered, square composition."
+        f"A cute neutral cartoon runner character mid-stride facing right, "
+        f"big friendly eyes, simple rounded body. {STYLE}"
     ),
     "runner_jumping": (
-        "A cute neutral cartoon runner character, flat 2D vector style, "
-        "vibrant Crossy Road art direction, joyful mid-air jump pose facing "
-        "right with arms up celebrating, big friendly eyes, bright cheerful "
-        "colors, isolated on a fully transparent background, no shadow, no "
-        "text, centered, square composition."
+        f"A cute neutral cartoon runner character in a joyful mid-air jump "
+        f"facing right with arms up celebrating, big friendly eyes. {STYLE}"
     ),
     "runner_stopped": (
-        "A cute neutral cartoon runner character, flat 2D vector style, "
-        "vibrant Crossy Road art direction, standing still facing right with "
-        "a worried concerned expression, sweat drop, arms slightly raised in "
-        "front, bright colors, isolated on a fully transparent background, "
-        "no shadow, no text, centered, square composition."
+        f"A cute neutral cartoon runner character standing still facing right "
+        f"with a worried concerned expression, small sweat drop, arms slightly "
+        f"raised. {STYLE}"
     ),
     "runner_victory": (
-        "A cute neutral cartoon runner character, flat 2D vector style, "
-        "vibrant Crossy Road art direction, heroic victory pose with one arm "
-        "raised holding a tiny gold star, sparkles around it, big smile, "
-        "bright cheerful colors, isolated on a fully transparent background, "
-        "no shadow, no text, centered, square composition."
+        f"A cute neutral cartoon runner character in a heroic victory pose "
+        f"with one arm raised holding a tiny gold star, sparkles around it, big "
+        f"smile. {STYLE}"
     ),
     "fire_small": (
-        "A small cute cartoon flame, single bright orange and yellow fire, "
-        "flat 2D vector style, vibrant Crossy Road art direction, bold "
-        "rounded outline, friendly not scary, isolated on a fully transparent "
-        "background, no shadow, no ground, no text, centered, square."
+        f"A small cute single cartoon flame, bright orange and yellow fire, "
+        f"friendly not scary. {STYLE}"
     ),
     "fire_large": (
-        "A large fierce cartoon bonfire, multiple bright orange red and yellow "
-        "flames, flat 2D vector style, vibrant Crossy Road art direction, bold "
-        "outline, dramatic but cute, isolated on a fully transparent "
-        "background, no shadow, no ground, no text, centered, square."
+        f"A large fierce cartoon bonfire with multiple bright orange red and "
+        f"yellow flames, dramatic but cute. {STYLE}"
     ),
     "tile_gold": (
-        "A shiny gold milestone tile, square block with a gold star symbol on "
-        "top, flat 2D vector style, vibrant Crossy Road art direction, glowing "
-        "sparkles, bold outline, isolated on a fully transparent background, "
-        "no shadow on the ground, no text, centered, square."
+        f"A shiny gold milestone tile, square block with a gold star symbol on "
+        f"top, glowing sparkles. {STYLE}"
     ),
     "badge_month_master": (
-        "A premium gold achievement badge, round medal with a number 30 in the "
-        "center and a star, ribbon below, flat 2D vector style, vibrant cartoon "
-        "art direction like Crossy Road, sparkles, bold outline, isolated on a "
-        "fully transparent background, no shadow, centered, square."
+        f"A premium gold achievement medal, round, with a star in the center, "
+        f"ribbon below, sparkles. {STYLE}"
     ),
 }
+
+
+def _chroma_to_alpha(b64_png: str, hex_color: str = CHROMA_HEX) -> str:
+    """Convert a solid chroma-key magenta background to true alpha transparency.
+
+    Uses numpy vectorized pixel ops. Tolerant enough to also catch antialiased
+    edges. Returns a base64-encoded PNG (no data: prefix) with alpha.
+    """
+    raw = base64.b64decode(b64_png)
+    im = Image.open(io.BytesIO(raw)).convert("RGBA")
+    arr = np.array(im)  # (H, W, 4)
+    r, g, b = arr[..., 0].astype(np.int16), arr[..., 1].astype(np.int16), arr[..., 2].astype(np.int16)
+    # Magenta-ish: red and blue dominant, green much lower.
+    mask = (r > 150) & (b > 150) & (g < 130) & ((r - g) > 60) & ((b - g) > 60)
+    # Soft edge: where pixel is partly magenta, partially fade alpha.
+    soft = (r > 120) & (b > 120) & (g < 160) & ((r - g) > 30) & ((b - g) > 30)
+    edge_only = soft & ~mask
+    arr[mask] = [0, 0, 0, 0]
+    if edge_only.any():
+        # Halve alpha and desaturate the magenta tint a touch.
+        edge_alpha = arr[..., 3].astype(np.int16)
+        edge_alpha[edge_only] = (edge_alpha[edge_only] // 2).astype(np.int16)
+        arr[..., 3] = edge_alpha.astype(np.uint8)
+    out = Image.fromarray(arr, mode="RGBA")
+    buf = io.BytesIO()
+    out.save(buf, format="PNG", optimize=True)
+    return base64.b64encode(buf.getvalue()).decode("ascii")
 
 
 class AssetPack(BaseModel):
@@ -111,13 +136,17 @@ class AssetGenerateRequest(BaseModel):
 
 
 async def _generate_one(key: str, prompt: str) -> str:
-    """Call Gemini Nano Banana and return base64 PNG (no data: prefix)."""
+    """Call Gemini Nano Banana and return base64 PNG (no data: prefix) with a
+    real alpha channel — we strip the solid magenta chroma-key background."""
     chat = LlmChat(
         api_key=EMERGENT_LLM_KEY,
         session_id=f"habit-asset-{key}-{uuid.uuid4()}",
         system_message=(
-            "You generate single-subject cartoon illustrations on transparent "
-            "backgrounds for a mobile game. Always honor the requested style."
+            "You generate single-subject cartoon illustrations for a mobile "
+            "game. The background MUST always be a completely uniform solid "
+            f"magenta {CHROMA_HEX} color — never a checkerboard, never a "
+            "gradient, never any pattern. The subject must never overlap or "
+            "use any pink or magenta tones."
         ),
     )
     chat.with_model("gemini", GEMINI_IMAGE_MODEL).with_params(
@@ -127,7 +156,8 @@ async def _generate_one(key: str, prompt: str) -> str:
     _text, images = await chat.send_message_multimodal_response(msg)
     if not images:
         raise RuntimeError(f"no image returned for {key}")
-    return images[0]["data"]  # already base64-encoded string
+    raw_b64 = images[0]["data"]
+    return _chroma_to_alpha(raw_b64)
 
 
 @api_router.get("/")
