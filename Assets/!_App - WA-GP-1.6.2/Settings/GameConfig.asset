@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf4b254648d841a0ae83188d8f5590be, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier:
+  habitColors:
+  - '#FF4081'
+  - '#E040FB'
+  - '#536DFE'
+  - '#00B8D4'
+  - '#FFAB40'
+  - '#FF5252'
+  - '#64DD17'
+  - '#FFD600'
+  categories:
+  - key: health
+    label: Health
+    icon: heart-pulse
+  - key: fitness
+    label: Fitness
+    icon: dumbbell
+  - key: mind
+    label: Mind
+    icon: meditation
+  - key: learn
+    label: Learn
+    icon: book-open-variant
+  - key: social
+    label: Social
+    icon: account-group
+  - key: other
+    label: Other
+    icon: star-four-points
+  icons:
+  - run
+  - dumbbell
+  - meditation
+  - book-open-variant
+  - water
+  - sleep
+  - food-apple
+  - music
+  - lightbulb-on
+  - heart-pulse
+  - yoga
+  - pencil
+  - code-tags
+  - broom
+  - leaf
+  - account-group

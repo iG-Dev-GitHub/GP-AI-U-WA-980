@@ -1,0 +1,6 @@
+/*
+ * Runtime theme for the Habit Cross panel. Imports Unity's default runtime
+ * theme (base control styling) and layers the app stylesheet on top.
+ */
+@import url("unity-theme://default");
+@import url("../USS/App.uss");

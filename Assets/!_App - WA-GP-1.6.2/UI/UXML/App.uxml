@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="../USS/App.uss" />
+    <!--
+      Root document tree. The AppController clones this into the runtime panel,
+      attaches safe-area padding to #app-root, and renders screens into
+      #screen-host. If this asset is unavailable the same structure is built in
+      code, so the app is resilient to missing references.
+    -->
+    <ui:VisualElement name="app-root" style="flex-grow: 1;">
+        <ui:VisualElement name="screen-host" style="flex-grow: 1;" />
+    </ui:VisualElement>
+</ui:UXML>

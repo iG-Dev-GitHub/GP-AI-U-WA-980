@@ -1,0 +1,56 @@
+/*
+ * Habit Cross Daily Streaker — app theme styles.
+ *
+ * The C# layer applies the authoritative inline styling so the UI is correct
+ * even before this sheet resolves; these rules provide theming hooks, sensible
+ * defaults, and a guaranteed "no visible scrollbars" backstop for every
+ * ScrollView (scrolling itself stays fully functional via touch / wheel / drag).
+ */
+
+#app-root {
+    flex-grow: 1;
+}
+
+#screen-host {
+    flex-grow: 1;
+}
+
+.text {
+    white-space: normal;
+}
+
+.heading {
+    -unity-font-style: bold;
+    color: rgb(38, 50, 56);
+}
+
+/* ---- Cards & blocks ---- */
+.card {
+    background-color: rgb(255, 255, 255);
+}
+
+/* ---- Hide all scrollbars, keep scrolling ---- */
+.unity-scroll-view__vertical-scroller,
+.unity-scroll-view__horizontal-scroller {
+    display: none;
+    width: 0;
+    height: 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+.unity-scroll-view--vertical > .unity-scroll-view__content-and-vertical-scroll-container
+    > .unity-scroll-view__vertical-scroller {
+    display: none;
+}
+
+/* Make the scroll content viewport take the full width once bars are hidden. */
+.unity-scroll-view__content-viewport {
+    flex-grow: 1;
+}
+
+/* ---- Text fields ---- */
+.unity-text-field__input {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+}
