@@ -42,7 +42,7 @@ namespace HabitCross.UI.Util
             { "check-bold", "✓" },
             { "check-circle", "✓" },
             { "plus", "+" },
-            { "close", "✕" },
+            { "close", "X" },
             { "arrow-left", "←" },
             { "arrow-right-bold", "→" },
             { "play-circle", "▶" },
