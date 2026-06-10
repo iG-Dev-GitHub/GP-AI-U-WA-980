@@ -1,7 +1,23 @@
 {
   "permissions": {
     "allow": [
-      "WebSearch"
+      "WebSearch",
+      "Bash(python3 -c ' *)",
+      "Bash(mkdir -p \"Assets/!_App - WA-GP-1.6.2/Graphics/AppIcon\")",
+      "Bash(cp \"Source/frontend/assets/images/icon.png\" \"Assets/!_App - WA-GP-1.6.2/Graphics/AppIcon/app-icon.png\")",
+      "Bash(cp \"Source/frontend/assets/images/adaptive-icon.png\" \"Assets/!_App - WA-GP-1.6.2/Graphics/AppIcon/adaptive-icon-foreground.png\")",
+      "Bash(python3)",
+      "Bash(sed -n '295,330p' ProjectSettings/ProjectSettings.asset)",
+      "Bash(sed -n '/- m_BuildTarget: Android/,/m_Kind: 1/p' ProjectSettings/ProjectSettings.asset)",
+      "Read(//mnt/c/Program Files/Unity/Hub/Editor/6000.3.16f1/Editor/Data/Managed/UnityEngine/**)",
+      "Bash(grep -i \"^textSettings$\\\\|^PanelTextSettings$\")",
+      "Bash(python3 *)",
+      "Bash(cp /tmp/app_release.rsp Temp/cc_check.rsp)",
+      "Bash(\"/mnt/c/Program Files/Unity/Hub/Editor/6000.3.16f1/Editor/Data/NetCoreRuntime/dotnet.exe\" \"C:\\\\\\\\Program Files\\\\\\\\Unity\\\\\\\\Hub\\\\\\\\Editor\\\\\\\\6000.3.16f1\\\\\\\\Editor\\\\\\\\Data\\\\\\\\DotNetSdkRoslyn\\\\\\\\csc.dll\" \"@C:\\\\\\\\Job\\\\\\\\GitHub\\\\\\\\GP-AI-U-WA-980\\\\\\\\Temp\\\\\\\\cc_check.rsp\")",
+      "Bash(echo \"exit: $?\")",
+      "Bash(echo \"csc exit: $?\")",
+      "Bash(ls -la Temp/cc_check.dll)",
+      "Bash(rm -f Temp/cc_check.dll Temp/cc_check.rsp Temp/cc_out.txt)"
     ]
   }
 }

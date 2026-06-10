@@ -79,7 +79,13 @@ namespace HabitCross.UI.Screens
             disc.style.justifyContent = Justify.Center;
             disc.style.marginBottom = 32;
             UIFactory.SetBottomBorder(disc, 6f, new Color(0, 0, 0, 0.08f));
-            disc.Add(BuildIllustration(index));
+            // Reference illustration baked together with the disc fill; the
+            // code-drawn shapes remain as a fallback when the texture is absent.
+            var illustration = App.OnboardingIllustration(index);
+            if (illustration != null)
+                disc.style.backgroundImage = new StyleBackground(illustration);
+            else
+                disc.Add(BuildIllustration(index));
             slide.Add(disc);
 
             var title = UIFactory.Text(s.title, 26, true, Theme.TextPrimary);

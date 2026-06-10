@@ -30,6 +30,10 @@ namespace HabitCross.App
         [SerializeField] private ThemeStyleSheet theme;
         [Tooltip("Game configuration (palette, categories, icons).")]
         [SerializeField] private GameConfig config;
+        [Tooltip("Panel settings asset carrying the text settings (emoji/fallback fonts). A panel is created in code when unset.")]
+        [SerializeField] private PanelSettings panelSettings;
+        [Tooltip("Onboarding slide illustrations (runner, gold tile, fire). Code-drawn shapes are used when unset.")]
+        [SerializeField] private Texture2D[] onboardingIllustrations;
 
         [Header("Fonts")]
         [Tooltip("Primary UI font. Provides a consistent, readable face on all devices.")]
@@ -45,6 +49,7 @@ namespace HabitCross.App
         // ---- Runtime ------------------------------------------------------
         private UIDocument _doc;
         private PanelSettings _panel;
+        private bool _ownsPanel;
         private VisualElement _host;
         private ScreenRouter _router;
 
@@ -55,6 +60,11 @@ namespace HabitCross.App
 
         public IReadOnlyList<Habit> Habits => _habits;
         public GameConfig Config { get; private set; }
+
+        public Texture2D OnboardingIllustration(int index) =>
+            onboardingIllustrations != null && index >= 0 && index < onboardingIllustrations.Length
+                ? onboardingIllustrations[index]
+                : null;
 
         /// <summary>Raised whenever habit data changes so live screens can refresh.</summary>
         public event Action HabitsChanged;
@@ -93,15 +103,25 @@ namespace HabitCross.App
 
         private void OnDestroy()
         {
-            if (_panel != null) Destroy(_panel);
+            if (_ownsPanel && _panel != null) Destroy(_panel);
         }
 
         // ---- Bootstrap ----------------------------------------------------
 
         private void BuildPanel()
         {
-            _panel = ScriptableObject.CreateInstance<PanelSettings>();
-            _panel.name = "HabitCrossPanelSettings";
+            // Prefer the serialized asset: its text settings (emoji/fallback fonts)
+            // can only be wired in the inspector, not through the runtime API.
+            _ownsPanel = panelSettings == null;
+            if (_ownsPanel)
+            {
+                _panel = ScriptableObject.CreateInstance<PanelSettings>();
+                _panel.name = "HabitCrossPanelSettings";
+            }
+            else
+            {
+                _panel = panelSettings;
+            }
             if (theme != null) _panel.themeStyleSheet = theme;
             else Debug.LogWarning("[AppController] No ThemeStyleSheet assigned; " +
                                   "text may not render until one is provided.");

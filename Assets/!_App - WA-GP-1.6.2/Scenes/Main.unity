@@ -167,8 +167,14 @@ MonoBehaviour:
   appStyle: {fileID: 7433441132597879392, guid: 62a1dd000f514b82999ea399a5af4f4e, type: 3}
   theme: {fileID: -4733365628477956816, guid: 3f8b4fb35cf24deaa16f1d308c40ee4b, type: 3}
   config: {fileID: 11400000, guid: 9754be3654344e949400cfd2cee412d0, type: 2}
+  panelSettings: {fileID: 11400000, guid: 147abfdeda7944cc9a1a5cc8f8306341, type: 2}
+  onboardingIllustrations:
+  - {fileID: 2800000, guid: 03f9b8a8fd9d40529470678d92d1144e, type: 3}
+  - {fileID: 2800000, guid: 303fff3886c04fe5b856cc2c9812c140, type: 3}
+  - {fileID: 2800000, guid: 41ef5402d42543808960669a8c9510f0, type: 3}
   bodyFont: {fileID: 12800000, guid: 8e7d6aa4a9d445cc896f558305897ad3, type: 3}
-  fallbackFonts: []
+  fallbackFonts:
+  - {fileID: 12800000, guid: 4ceb4ef69050b8449bb7ec0114a61687, type: 3}
   referenceResolution: {x: 480, y: 1040}
   screenMatch: 0.5
 --- !u!1 &1440721201
